@@ -12,7 +12,7 @@ if($remoteIp == "::1")
 }
 
 
-mysql_connect('localhost',$username,$password);
+mysql_connect('db1.cgicloud.info',$username,$password);
 @mysql_select_db($database) or die( "Unable to select database");
 
 $query = "INSERT INTO `demo_access_log`(`instance`, `user_ip`) VALUES ('".$ip."','".$remoteIp."')";
