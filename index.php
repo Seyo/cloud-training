@@ -1,10 +1,11 @@
 <?php 
-$username="dbuser";
-$password="dbpassword";
-$database="dbuser";
+$username=getenv('DATABASE_APPLICATION_USERNAME');
+$password=getenv('DATABASE_APPLICATION_PASSWORD');
+$database=getenv('DATABASE_SCHEMA_NAME');
 $remoteIp = $_SERVER['REMOTE_ADDR'];
 $ip = file_get_contents('http://icanhazip.com/');
-$java_home = getenv('JAVA_HOME');
+
+echo "user: ".$username. "<br />";
 
 if($remoteIp == "::1")
 {
