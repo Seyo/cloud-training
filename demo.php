@@ -19,7 +19,7 @@ $query = "INSERT INTO `demo_access_log`(`instance`, `user_ip`) VALUES ('".$ip."'
 
 mysql_query($query);
 
-$result = mysql_query("SELECT * FROM demo_access_log order by access_time desc");
+$result = mysql_query("SELECT * FROM demo_access_log order by access_time desc limit 100");
 
 echo '<table style="border-spacing: 0;"><th>Server IP</th><th style=\"padding:0 10px 0 10px;\">Remote IP</th><th style=\"padding:0 10px 0 10px;\">Access Time</th>';
 $count=0;
