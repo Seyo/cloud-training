@@ -1,0 +1,451 @@
+<style type="text/css">
+  .form-line{
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 36px;
+    padding-right: 36px;
+    margin: 0px 0;
+    width: 100%;
+    box-sizing: border-box;
+    clear: both;
+    display: block;   
+}
+.form-label-left {
+    float: left;
+    display: inline-block;
+    text-align: left;
+    padding: 3px;
+    white-space: normal;
+    width: 150px !important;
+}
+.form-textbox, .form-textarea, .form-radio-other-input, .form-captcha input {
+    padding: 3px;
+	border-top: 1px solid rgb(22, 22, 22);
+	border-right: 1px solid rgb(22, 22, 22);
+	font-size: 1em;
+	line-height: 1.071em;
+	background: #1a1a1a;
+	color: rgb(190, 190, 190);
+	border-bottom: 1px solid rgb(63, 63, 63);
+	border-left: 1px solid rgb(63,63,63);
+	border-radius: 3px;
+}
+.form-textbox:hover
+{
+	border-bottom: 1px solid rgb(63, 63, 63);
+	border-left: 1px solid rgb(63,63,63);
+	border-top: 1px solid rgb(22, 22, 22);
+	border-right: 1px solid rgb(22, 22, 22);
+	background: #222;
+}
+.form-required {
+    margin-left: 5px;
+    color: red;
+}
+.form-submit-button{
+	background-color: #0066AA;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0, #0066AA), color-stop(1.0, #00416D));
+	background: -webkit-linear-gradient(center top, #0066AA 0%, #00416D 100%);
+	background: -moz-linear-gradient(center top, #0066AA 0%, #00416D 100%);
+	background: -ms-linear-gradient(center top, #0066AA 0%, #00416D 100%);
+	background: -o-linear-gradient(center top, #0066AA 0%, #00416D 100%);
+	border: 1px solid #111111;
+	border-radius: 3px;
+	box-shadow: 0 1px 1px rgba(255, 255, 255, 0.1), 0 -1px 1px rgba(0, 0, 0, 0.2);
+	color: #FFF;
+	display: inline-block;
+	margin: 3px 0 0;
+	padding: 0px 10px;
+	text-align: center;
+	text-decoration: none;
+	opacity: 0.9;
+	font: 13.3px/1.7 "Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif;
+}
+.form-submit-button:hover{
+	cursor: pointer;
+	opacity: 1;
+	background-color: #0077c3;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0, #0077c3), color-stop(1.0, #004c80));
+	background: -webkit-linear-gradient(center top, #0077c3 0%, #004c80 100%);
+	background: -moz-linear-gradient(center top, #0077c3 0%, #004c80 100%);
+	background: -ms-linear-gradient(center top, #0077c3 0%, #004c80 100%);
+	background: -o-linear-gradient(center top, #0077c3 0%, #004c80 100%);
+	text-decoration: none;
+	border: 1px solid #111111;
+}
+#messagebox{
+	border-radius: 6px;
+	padding: 5px;
+	-webkit-transition: all 0.1s ease-in-out;
+	visibility: hidden;
+}
+.success{
+	background: rgb(53, 70, 52);
+	border: 1px solid rgb(34, 177, 45);
+	color: #ccc;
+}
+.error{
+	background: rgb(70, 52, 52);
+	border: 1px solid rgb(177, 34, 34);
+	color: #ccc;
+}
+</style>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript">
+
+var form = $("#registerform");
+
+
+function beforesubmit(){
+	$('#messagebox').css("visibility","hidden");	
+	$('#messagebox').removeClass();
+	$('#messagebox').empty();
+	
+	var firstname = $("#input_1");
+	var lastname = $("#input_3");
+	var social = $("#input_4");
+	//var sex = $("#input_5_0");
+	var address = $("#input_6");
+	var coaddress = $("#input_7");
+	var zipcode = $("#input_8");
+	var country = $("#input_9");
+	var email = $("#input_10");
+	var phone = $("#input_11");
+	var altphone = $("#input_12");
+	var province = $("#input_13");
+	
+	var validated = true;
+	
+	if(!validateName(firstname))
+		validated = false;
+	
+	if(!validateName(lastname))
+		validated = false;
+		
+	if(!validateSocial(social))
+		validated = false;
+	
+	if(!validateZip(zipcode))
+		validated = false;
+		
+	if(!validateEmail(email))
+		validated = false;
+	
+	if(!validatePhone(phone))
+		validated = false;
+		
+	if(!validateString(address))
+		validated = false;
+		
+	if(!validateString(country))
+		validated = false;
+	
+	if(!validateString(province))
+		validated = false;
+		
+	if ($("input[name='sex']:checked").length > 0){
+		$("#label_5").css("color","");
+	}
+	else{
+		$("#label_5").css("color","f00");
+		validated = false;
+	}
+
+	if(validated)
+		alert("A");
+	
+    var url = "../index.php"; // the script where you handle the form input.
+    $.ajax({
+           type: "POST",
+           url: url,
+           data: $("#registerform").serialize(), // serializes the form's elements.
+           success: function(data)
+           {
+				var message = parseResponse(data);
+				
+				$('#messagebox').append(message);
+				if(message.indexOf("Failure:") !== -1)
+				{
+					$('#messagebox').addClass('error');
+					$('#messagebox').css("visibility","visible");
+				}
+				else
+				{
+					$('#messagebox').addClass('success');
+					$('#messagebox').css("visibility","visible");
+				}	
+           }
+         });
+}
+function resetmyuser()
+{
+	$('#messagebox').css("visibility","hidden");	
+	$('#messagebox').removeClass();
+	$('#messagebox').empty();
+	var url = "http://ruthless.se/index.php?page=community_backend"; // the script where you handle the form input.
+    $.ajax({
+           type: "POST",
+           url: url,
+           data: {
+				reset: 'true',
+			},
+           success: function(data)
+           {
+				var message = parseResponse(data);
+				
+				$('#messagebox').append(message);
+				
+				$('#messagebox').addClass('success');	
+				$('#messagebox').css("visibility","visible");				
+           }
+         });
+}
+function viewmyuser()
+{
+	$('#messagebox').css("visibility","hidden");	
+	$('#messagebox').removeClass();
+	
+	var url = "http://ruthless.se/index.php?page=community_backend"; // the script where you handle the form input.
+    $.ajax({
+           type: "GET",
+           url: url,
+           data: {
+				view: 'user',
+			},
+           success: function(data)
+           {		
+				var message = parseResponse(data);
+				$('#messagebox').empty();
+				//alert("Data: "+message); // show response from the php script.
+				if(message != "You are not registered")
+				{
+					var json = JSON.parse(message);
+					
+					var outString = " <div  class='sp_news_body_new'><table>"+
+					"<tr><td>Förnamn</td><td>"+json.response[0].firstname+"</td></tr>"+
+					"<tr><td>Efternamn</td><td>"+json.response[0].lastname+"</td></tr>"+
+					"<tr><td>personnummer</td><td>"+json.response[0].socialnumber+"</td></tr>"+
+					"<tr><td>Kön</td><td>"+json.response[0].sex+"</td></tr>"+
+					"<tr><td>Adress</td><td>"+json.response[0].address+"</td></tr>"+
+					"<tr><td>Co Adress</td><td>"+json.response[0].Co_address+"</td></tr>"+
+					"<tr><td>Postadress</td><td>"+json.response[0].zipcode+"</td></tr>"+
+					"<tr><td>Ort</td><td>"+json.response[0].province+"</td></tr>"+
+					"<tr><td>Land</td><td>"+json.response[0].country+"</td></tr>"+
+					"<tr><td>Email</td><td>"+json.response[0].email+"</td></tr>"+
+					"<tr><td>Telefonnummer</td><td>"+json.response[0].phone+"</td></tr>"+
+					"<tr><td>Alt Telefonnummer</td><td>"+json.response[0].alt_phone+"</td></tr>"+
+					"<tr><td>Reg. Datum</td><td>"+json.response[0].reg_date+"</td></tr>"+
+					"</table></div>";	
+					$('#resultdiv').empty();
+					$('#resultdiv').append(outString);
+				}
+				else
+				{
+					$('#resultdiv').empty();
+					
+					$('#messagebox').append(message);				
+					$('#messagebox').addClass('error');
+					$('#messagebox').css("visibility","visible");
+				}
+           }
+         });
+}
+function parseResponse(data)
+{
+	if (/DBSTATUSMESSAGE/i.test(data))
+	{
+		var dataArray = data.split("[DBSTATUSMESSAGE]");				
+		var dataArray2 = dataArray[1].split("[/DBSTATUSMESSAGE]");
+		var message = dataArray2[0];
+	}
+	else
+	{
+		var message = "Failure: Error in string";
+	}
+	return message;
+}
+
+function validateString(input){
+	//if it's NOT valid
+	if(input.val().length < 1){
+		input.addClass("error");
+		return false;
+	}
+	//if it's valid
+	else{
+		input.removeClass("error");
+		return true;
+	}
+}
+function validateName(input){
+	var re = /^[A-ZÅÖÄa-zåäö\s]{1,300}$/;	
+	if (!re.test(input.val())) {
+		input.addClass("error");
+		return false;
+	}
+	else{
+		input.removeClass("error");
+		return true;
+	}
+
+}
+function validateSocial(input){
+	var re = /^[12]{1}[90]{1}[0-9]{6}-[0-9]{4}$/;
+	
+	if (!re.test(input.val())) {
+		input.addClass("error");
+		return false;
+	}
+	else{
+		input.removeClass("error");
+		return true;
+	}
+
+}
+function validateEmail(input){
+	var re = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/;
+	
+	if (!re.test(input.val())) {
+		input.addClass("error");
+		return false;
+	}
+	else{
+		input.removeClass("error");
+		return true;
+	}
+}
+function validateZip(input){
+	var re = /^[0-9]{5}$/;
+	
+	if (!re.test(input.val())) {
+		input.addClass("error");
+		return false;
+	}
+	else{
+		input.removeClass("error");
+		return true;
+	}
+}
+function validatePhone(input){
+	var re = /^[0]{1}[0-9]{6,15}$/;
+	
+	if (!re.test(input.val())) {
+		input.addClass("error");
+		return false;
+	}
+	else{
+		input.removeClass("error");
+		return true;
+	}
+}
+
+
+</script>
+<table border="0" style="width:100%">
+<tr><td colspan="2" align="center"><div id="messagebox"></div></td><tr>
+<tr><td rowspan="2" width="50%">
+<form action="#" method="post" name="registerform" id="registerform">
+  <input type="hidden" name="register" value="true">
+  <div class="form-all">
+    <ul class="form-section" style="margin-top:0px;">
+      <li class="form-line" id="id_1">
+        <label class="form-label-left" id="label_1" for="input_1">
+          Förnamn
+          <span class="form-required">*</span> </label><div id="cid_1" class="form-input"> 
+		  <input type="text" class="form-textbox validate[required]" id="input_1" name="firstname" size="20"> </div>
+      </li>
+      <li class="form-line" id="id_3">
+        <label class="form-label-left" id="label_3" for="input_3">
+          Efternamn
+          <span class="form-required">*</span> </label><div id="cid_3" class="form-input"> 
+		  <input type="text" class="form-textbox validate[required]" id="input_3" name="lastname" size="20"> </div>
+      </li>
+      <li class="form-line" id="id_4">
+        <label class="form-label-left" id="label_4" for="input_4">
+          Personnummer
+          <span class="form-required">*</span> </label><div id="cid_4" class="form-input"> 
+		  <input type="text" class="form-textbox validate[required]" id="input_4" name="socialnumber" size="20"> </div>
+      </li>
+      <li class="form-line" id="id_5">
+        <label class="form-label-left" id="label_5" for="input_5">
+          Kön
+          <span class="form-required">*</span> </label>
+		  <div id="cid_5" class="form-input"> 
+			<div class="form-single-column"><span class="form-radio-item" style="clear:left;">
+			<input type="radio" class="form-radio validate[required]" id="input_5_0" name="sex" value="Man"><label for="input_5_0">Man</label></span><span class="clearfix"></span><span class="form-radio-item" style="clear:left;"><input type="radio" class="form-radio validate[required]" id="input_5_1" name="sex" value="Kvinna"><label for="input_5_1">Kvinna</label></span><span class="clearfix"></span></div>
+		  </div>
+  </li>
+  <li class="form-line" id="id_6">
+    <label class="form-label-left" id="label_6" for="input_6">
+      Adress
+      <span class="form-required">*</span> </label><div id="cid_6" class="form-input"> 
+	  <input type="text" class="form-textbox validate[required]" id="input_6" name="address" size="20"> </div>
+  </li>
+  <li class="form-line" id="id_7">
+    <label class="form-label-left" id="label_7" for="input_7"> CO Adress </label>
+    <div id="cid_7" class="form-input">
+      <input type="text" class="form-textbox" id="input_7" name="co_address" size="20">
+    </div>
+  </li>
+  <li class="form-line" id="id_8">
+    <label class="form-label-left" id="label_8" for="input_8">
+      Postnummer
+      <span class="form-required">*</span> </label><div id="cid_8" class="form-input"> 
+	  <input type="text" class="form-textbox validate[required]" id="input_8" name="zipcode" size="20"> </div>
+  </li>
+  <li class="form-line" id="id_13">
+    <label class="form-label-left" id="label_13" for="input_13">
+      Ort
+      <span class="form-required">*</span> </label><div id="cid_13" class="form-input"> 
+	  <input type="text" class="form-textbox validate[required]" id="input_13" name="province" size="20"> </div>
+  </li>
+  <li class="form-line" id="id_9">
+    <label class="form-label-left" id="label_9" for="input_9">
+      Land
+      <span class="form-required">*</span> </label><div id="cid_9" class="form-input"> 
+	  <input type="text" class="form-textbox validate[required]" id="input_9" name="country" size="20"> </div>
+  </li>
+  <li class="form-line" id="id_10">
+    <label class="form-label-left" id="label_10" for="input_10">
+      Email
+      <span class="form-required">*</span> </label><div id="cid_10" class="form-input"> 
+	  <input type="text" class="form-textbox validate[required]" id="input_10" name="email" size="20"> </div>
+  </li>
+  <li class="form-line" id="id_11">
+    <label class="form-label-left" id="label_11" for="input_11">
+      Telefonnummer
+      <span class="form-required">*</span> </label><div id="cid_11" class="form-input"> 
+	  <input type="text" class="form-textbox validate[required]" id="input_11" name="phone" size="20"> </div>
+  </li>
+  <li class="form-line" id="id_12">
+    <label class="form-label-left" id="label_12" for="input_12"> Alt Telefonnummer </label>
+    <div id="cid_12" class="form-input">
+      <input type="text" class="form-textbox" id="input_12" name="alt_phone" size="20">
+    </div>
+  </li>
+  <li class="form-line" id="id_2">
+    <div id="cid_2" class="form-input-wide">
+      <div style="margin-left:156px" class="form-buttons-wrapper">
+        <button id="input_2" type="button" class="form-submit-button" onclick="beforesubmit();">
+          Submit
+        </button>
+      </div>
+    </div>
+  </li>
+  </ul>
+  </div>
+  </form>
+  </td><td valign="top"  width="50%">
+  
+  <button id="reset" type="button" class="form-submit-button" onclick="resetmyuser();">
+          Reset my user [DEBUG]
+  </button>
+  <br>
+  <button id="view" type="button" class="form-submit-button" onclick="viewmyuser();">
+          Show
+  </button>
+  
+  </td></tr>
+  <tr><td id="resultdiv">
+  </td></tr>
+  </table>
